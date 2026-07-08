@@ -17,13 +17,13 @@ jobs:
             openapitools/openapi-generator-cli:v7.10.0 \
             generate -i /local/openapi.yaml -g typescript-axios -o /local \
             --skip-validate-spec \
-            --additional-properties=npmName=@griffnode/js-sdk,npmVersion=1.0.1,supportsES6=true,useSingleRequestParameter=true,gitUserId=CryptoGateHQ,gitRepoId=js-sdk
+            --additional-properties=npmName=@griffnode/js-sdk,npmVersion=1.0.1,supportsES6=true,useSingleRequestParameter=true,gitUserId=GriffNode,gitRepoId=js-sdk
       - name: Fix package.json metadata (generator placeholder breaks npm provenance)
         run: |
           npm pkg set repository.type=git
-          npm pkg set repository.url="git+https://github.com/CryptoGateHQ/js-sdk.git"
+          npm pkg set repository.url="git+https://github.com/GriffNode/js-sdk.git"
           npm pkg set homepage="https://docs.griffnode.com/reference"
-          npm pkg set bugs.url="https://github.com/CryptoGateHQ/js-sdk/issues"
+          npm pkg set bugs.url="https://github.com/GriffNode/js-sdk/issues"
       - name: Commit regenerated SDK
         run: |
           git config user.name  "github-actions[bot]"

@@ -5,7 +5,7 @@
   "author": "OpenAPI-Generator Contributors",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CryptoGateHQ/js-sdk.git"
+    "url": "git+https://github.com/GriffNode/js-sdk.git"
   },
   "keywords": [
     "axios",
@@ -32,6 +32,6 @@
   },
   "homepage": "https://docs.griffnode.com/reference",
   "bugs": {
-    "url": "https://github.com/CryptoGateHQ/js-sdk/issues"
+    "url": "https://github.com/GriffNode/js-sdk/issues"
   }
 }
