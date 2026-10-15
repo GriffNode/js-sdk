@@ -1038,6 +1038,141 @@ export type PlanTier = typeof PlanTier[keyof typeof PlanTier];
 
 
 /**
+ * Recurring payment request event. schedule_id + your own reference identify the customer/order. The period\'s payment also fires the normal payment.* events. 
+ * @export
+ * @interface RecurringWebhookPayload
+ */
+export interface RecurringWebhookPayload {
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'event': RecurringWebhookPayloadEventEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'timestamp': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'schedule_id': string;
+    /**
+     * Your own customer/order id, as entered on the schedule.
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'reference'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'customer_email'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'description'?: string;
+    /**
+     * Decimal string.
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'amount_fiat'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'currency_fiat'?: RecurringWebhookPayloadCurrencyFiatEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'interval'?: RecurringWebhookPayloadIntervalEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'status': RecurringWebhookPayloadStatusEnum;
+    /**
+     * recurring.payment.* only.
+     * @type {number}
+     * @memberof RecurringWebhookPayload
+     */
+    'period_no'?: number;
+    /**
+     * recurring.payment.completed only.
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'transaction_id'?: string;
+    /**
+     * recurring.stopped only.
+     * @type {string}
+     * @memberof RecurringWebhookPayload
+     */
+    'reason'?: RecurringWebhookPayloadReasonEnum;
+}
+
+export const RecurringWebhookPayloadEventEnum = {
+    Confirmed: 'recurring.confirmed',
+    PaymentCompleted: 'recurring.payment.completed',
+    PaymentUnpaid: 'recurring.payment.unpaid',
+    Stopped: 'recurring.stopped'
+} as const;
+
+export type RecurringWebhookPayloadEventEnum = typeof RecurringWebhookPayloadEventEnum[keyof typeof RecurringWebhookPayloadEventEnum];
+export const RecurringWebhookPayloadCurrencyFiatEnum = {
+    Usd: 'USD',
+    Pln: 'PLN',
+    Eur: 'EUR',
+    Gbp: 'GBP'
+} as const;
+
+export type RecurringWebhookPayloadCurrencyFiatEnum = typeof RecurringWebhookPayloadCurrencyFiatEnum[keyof typeof RecurringWebhookPayloadCurrencyFiatEnum];
+export const RecurringWebhookPayloadIntervalEnum = {
+    Weekly: 'weekly',
+    Monthly: 'monthly',
+    Quarterly: 'quarterly',
+    Yearly: 'yearly'
+} as const;
+
+export type RecurringWebhookPayloadIntervalEnum = typeof RecurringWebhookPayloadIntervalEnum[keyof typeof RecurringWebhookPayloadIntervalEnum];
+export const RecurringWebhookPayloadStatusEnum = {
+    PendingConfirmation: 'pending_confirmation',
+    Active: 'active',
+    Paused: 'paused',
+    Cancelled: 'cancelled',
+    StoppedByCustomer: 'stopped_by_customer',
+    Bounced: 'bounced',
+    ExpiredUnconfirmed: 'expired_unconfirmed'
+} as const;
+
+export type RecurringWebhookPayloadStatusEnum = typeof RecurringWebhookPayloadStatusEnum[keyof typeof RecurringWebhookPayloadStatusEnum];
+export const RecurringWebhookPayloadReasonEnum = {
+    StoppedByCustomer: 'stopped_by_customer',
+    Bounced: 'bounced',
+    Unconfirmed: 'unconfirmed'
+} as const;
+
+export type RecurringWebhookPayloadReasonEnum = typeof RecurringWebhookPayloadReasonEnum[keyof typeof RecurringWebhookPayloadReasonEnum];
+
+/**
  * The canonical, curated public view of a transaction (same shape from create, get and list). Internal fields (capability tokens, client_ip, address_index, derivation/db internals) are deliberately NOT exposed. 
  * @export
  * @interface Transaction
@@ -2171,11 +2306,12 @@ export const SystemApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} pk Publishable key, pk_live_… / pk_test_…
          * @param {string} amount Fiat amount (≥ 1.00 USD equivalent).
          * @param {CryptoSymbol} crypto 
-         * @param {string} [link] Payment-link slug for attribution.
+         * @param {HostedCheckoutRedirectCurrencyEnum} [currency] Fiat currency of &#x60;amount&#x60;. Ignored when &#x60;link&#x60; is set: a payment link always uses its own amount and currency.
+         * @param {string} [link] Payment-link slug. The link\&#39;s own amount, currency, expiry and single-use rules apply (410 if expired, 409 if a single-use link was already paid).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        hostedCheckoutRedirect: async (pk: string, amount: string, crypto: CryptoSymbol, link?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        hostedCheckoutRedirect: async (pk: string, amount: string, crypto: CryptoSymbol, currency?: HostedCheckoutRedirectCurrencyEnum, link?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pk' is not null or undefined
             assertParamExists('hostedCheckoutRedirect', 'pk', pk)
             // verify required parameter 'amount' is not null or undefined
@@ -2204,6 +2340,10 @@ export const SystemApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (crypto !== undefined) {
                 localVarQueryParameter['crypto'] = crypto;
+            }
+
+            if (currency !== undefined) {
+                localVarQueryParameter['currency'] = currency;
             }
 
             if (link !== undefined) {
@@ -2249,12 +2389,13 @@ export const SystemApiFp = function(configuration?: Configuration) {
          * @param {string} pk Publishable key, pk_live_… / pk_test_…
          * @param {string} amount Fiat amount (≥ 1.00 USD equivalent).
          * @param {CryptoSymbol} crypto 
-         * @param {string} [link] Payment-link slug for attribution.
+         * @param {HostedCheckoutRedirectCurrencyEnum} [currency] Fiat currency of &#x60;amount&#x60;. Ignored when &#x60;link&#x60; is set: a payment link always uses its own amount and currency.
+         * @param {string} [link] Payment-link slug. The link\&#39;s own amount, currency, expiry and single-use rules apply (410 if expired, 409 if a single-use link was already paid).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async hostedCheckoutRedirect(pk: string, amount: string, crypto: CryptoSymbol, link?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.hostedCheckoutRedirect(pk, amount, crypto, link, options);
+        async hostedCheckoutRedirect(pk: string, amount: string, crypto: CryptoSymbol, currency?: HostedCheckoutRedirectCurrencyEnum, link?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.hostedCheckoutRedirect(pk, amount, crypto, currency, link, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SystemApi.hostedCheckoutRedirect']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -2286,7 +2427,7 @@ export const SystemApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         hostedCheckoutRedirect(requestParameters: SystemApiHostedCheckoutRedirectRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.hostedCheckoutRedirect(requestParameters.pk, requestParameters.amount, requestParameters.crypto, requestParameters.link, options).then((request) => request(axios, basePath));
+            return localVarFp.hostedCheckoutRedirect(requestParameters.pk, requestParameters.amount, requestParameters.crypto, requestParameters.currency, requestParameters.link, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2319,7 +2460,14 @@ export interface SystemApiHostedCheckoutRedirectRequest {
     readonly crypto: CryptoSymbol
 
     /**
-     * Payment-link slug for attribution.
+     * Fiat currency of &#x60;amount&#x60;. Ignored when &#x60;link&#x60; is set: a payment link always uses its own amount and currency.
+     * @type {'USD' | 'PLN' | 'EUR' | 'GBP'}
+     * @memberof SystemApiHostedCheckoutRedirect
+     */
+    readonly currency?: HostedCheckoutRedirectCurrencyEnum
+
+    /**
+     * Payment-link slug. The link\&#39;s own amount, currency, expiry and single-use rules apply (410 if expired, 409 if a single-use link was already paid).
      * @type {string}
      * @memberof SystemApiHostedCheckoutRedirect
      */
@@ -2353,10 +2501,20 @@ export class SystemApi extends BaseAPI {
      * @memberof SystemApi
      */
     public hostedCheckoutRedirect(requestParameters: SystemApiHostedCheckoutRedirectRequest, options?: RawAxiosRequestConfig) {
-        return SystemApiFp(this.configuration).hostedCheckoutRedirect(requestParameters.pk, requestParameters.amount, requestParameters.crypto, requestParameters.link, options).then((request) => request(this.axios, this.basePath));
+        return SystemApiFp(this.configuration).hostedCheckoutRedirect(requestParameters.pk, requestParameters.amount, requestParameters.crypto, requestParameters.currency, requestParameters.link, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
+/**
+ * @export
+ */
+export const HostedCheckoutRedirectCurrencyEnum = {
+    Usd: 'USD',
+    Pln: 'PLN',
+    Eur: 'EUR',
+    Gbp: 'GBP'
+} as const;
+export type HostedCheckoutRedirectCurrencyEnum = typeof HostedCheckoutRedirectCurrencyEnum[keyof typeof HostedCheckoutRedirectCurrencyEnum];
 
 
 /**
