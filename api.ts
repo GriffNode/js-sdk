@@ -311,6 +311,7 @@ export const CryptoSymbol = {
     Eth: 'ETH',
     Usdt: 'USDT',
     Usdc: 'USDC',
+    Eurc: 'EURC',
     Dai: 'DAI',
     Wbtc: 'WBTC',
     Shib: 'SHIB',
