@@ -125,9 +125,10 @@ export interface AccountUsage {
      */
     'monthly_transaction_limit'?: number | null;
     /**
-     * 
+     * Always 0. Plans have a hard monthly limit and no overage.
      * @type {number}
      * @memberof AccountUsage
+     * @deprecated
      */
     'overage_cost_per_tx'?: number;
 }
@@ -314,12 +315,12 @@ export const CryptoSymbol = {
     Eurc: 'EURC',
     Dai: 'DAI',
     Wbtc: 'WBTC',
+    Weth: 'WETH',
     Shib: 'SHIB',
     Pepe: 'PEPE',
     Link: 'LINK',
     Uni: 'UNI',
-    Aave: 'AAVE',
-    Mkr: 'MKR'
+    Leo: 'LEO'
 } as const;
 
 export type CryptoSymbol = typeof CryptoSymbol[keyof typeof CryptoSymbol];
@@ -978,9 +979,10 @@ export interface Plan {
      */
     'monthly_transaction_limit'?: number | null;
     /**
-     * 
+     * Always 0. Plans have a hard monthly limit and no overage.
      * @type {number}
      * @memberof Plan
+     * @deprecated
      */
     'overage_cost_per_tx'?: number;
     /**
@@ -1572,8 +1574,9 @@ export const AccountApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary On-platform balances (for overage/top-up; NOT crypto settlement)
+         * @summary Deprecated: always an empty list. GriffNode keeps no on-platform balance (no overage, no top-ups); crypto settles straight to your wallet.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         listBalances: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -1718,8 +1721,9 @@ export const AccountApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary On-platform balances (for overage/top-up; NOT crypto settlement)
+         * @summary Deprecated: always an empty list. GriffNode keeps no on-platform balance (no overage, no top-ups); crypto settles straight to your wallet.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async listBalances(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListBalances200Response>> {
@@ -1784,8 +1788,9 @@ export const AccountApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary On-platform balances (for overage/top-up; NOT crypto settlement)
+         * @summary Deprecated: always an empty list. GriffNode keeps no on-platform balance (no overage, no top-ups); crypto settles straight to your wallet.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         listBalances(options?: RawAxiosRequestConfig): AxiosPromise<ListBalances200Response> {
@@ -1865,8 +1870,9 @@ export class AccountApi extends BaseAPI {
 
     /**
      * 
-     * @summary On-platform balances (for overage/top-up; NOT crypto settlement)
+     * @summary Deprecated: always an empty list. GriffNode keeps no on-platform balance (no overage, no top-ups); crypto settles straight to your wallet.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof AccountApi
      */
@@ -1908,7 +1914,7 @@ export const BillingApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @summary Start a plan upgrade or account top-up
+         * @summary Start a plan upgrade
          * @param {CreateBillingCheckoutRequest} createBillingCheckoutRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1958,7 +1964,7 @@ export const BillingApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Start a plan upgrade or account top-up
+         * @summary Start a plan upgrade
          * @param {CreateBillingCheckoutRequest} createBillingCheckoutRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1981,7 +1987,7 @@ export const BillingApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @summary Start a plan upgrade or account top-up
+         * @summary Start a plan upgrade
          * @param {BillingApiCreateBillingCheckoutRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2015,7 +2021,7 @@ export interface BillingApiCreateBillingCheckoutRequest {
 export class BillingApi extends BaseAPI {
     /**
      * 
-     * @summary Start a plan upgrade or account top-up
+     * @summary Start a plan upgrade
      * @param {BillingApiCreateBillingCheckoutRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
